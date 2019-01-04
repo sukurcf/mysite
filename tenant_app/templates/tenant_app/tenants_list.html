@@ -1,0 +1,91 @@
+{% extends 'tenant_app/base.html' %}
+{% block content %}
+<div class="container">
+    <form method="GET" action="">
+        <div class="input-field">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search Here...">
+            <button class="btn" type="submit" name="action">Search</button>
+        </div>
+    </form>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Mobile 1</th>
+            <th>Mobile 2</th>
+            <th>Mobile 3</th>
+            <th>Address 1</th>
+            <th>City</th>
+            <th>Country</th>
+            <th>Location</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for tenant in tenants %}
+        <tr>
+            <td> {{ tenant.name }}</td>
+            <td> {{ tenant.age }}</td>
+            <td> {{ tenant.gender }}</td>
+            <td> {{ tenant.mobile_1 }}</td>
+            <td> {{ tenant.mobile_2 }}</td>
+            <td> {{ tenant.mobile_3 }}</td>
+            <td> {{ tenant.address_1 }}</td>
+            <td> {{ tenant.city }}</td>
+            <td> {{ tenant.country }}</td>
+            <td> {{ tenant.location }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if tenants.has_other_pages %}
+    <ul class="pagination">
+        {% if tenants.has_previous %}
+        <li><a href="?page={{ tenants.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+        <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in tenants.paginator.page_range %}
+        {% if tenants.number == i %}
+        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+        {% else %}
+        <li><a href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if tenants.has_next %}
+        <li><a href="?page={{ tenants.next_page_number }}">&raquo;</a></li>
+        {% else %}
+        <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% if tenants.has_other_pages %}
+    <ul class="pagination">
+        {% if tenants.has_previous %}
+            <li class="waves-effect"><a href="?page=
+                    {{ tenants.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                    class="material-icons">chevron_left</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+        {% endif %}
+        {% for num in tenants.paginator.page_range %}
+            {% if tenants.number == num %}
+                <li class="active"><a href="#!">{{ num }}</a></li>
+            {% else %}
+                <li class="waves-effect"><a
+                        href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if tenants.has_next %}
+            <li class="waves-effect"><a
+                    href="?page={{ tenants.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                    class="material-icons">chevron_right</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+        {% endif %}
+    </ul>
+{% endif %}

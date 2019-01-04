@@ -1,0 +1,21 @@
+{% extends 'tenant_app/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row main">
+        <div class="main-login main-center">
+            <h1>Add new Tenant</h1>
+            <form class="" method="post" action="#">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Submit">
+                {% if form.errors %}
+                    {% for error in form.errors %}
+                        {{ error }}
+                    {% endfor %}
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
