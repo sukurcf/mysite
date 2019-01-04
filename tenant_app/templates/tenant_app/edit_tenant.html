@@ -9,9 +9,9 @@
                 {{ form.as_p }}
                 <input type="submit" value="Submit">
                 {% if form.errors %}
-                    {% for error in form.errors %}
-                        {{ error }}
-                    {% endfor %}
+                {% for error in form.errors %}
+                {{ error }}
+                {% endfor %}
                 {% endif %}
             </form>
         </div>

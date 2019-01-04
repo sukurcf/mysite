@@ -1,15 +1,44 @@
 {% extends 'tenant_app/base.html' %}
 {% block content %}
+<script>
+function myFunction() {
+    var input, filter, found, table, tr, td, i, j;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("myTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td");
+        for (j = 0; j < td.length; j++) {
+            if (td[j].innerHTML.toUpperCase().indexOf(filter) > -1) {
+                found = true;
+            }
+        }
+        if (found) {
+            tr[i].style.display = "";
+            found = false;
+        } else {
+            tr[i].style.display = "none";
+        }
+    }
+}
+function deleteTenant(i) {
+    if(confirm('Are you sure you want to delete this tenant ID - '+ i +' ?')){
+        window.location = "tenant_app/delete/"+i;
+    }
+    else{
+
+    }
+}
+</script>
 <div class="container">
-    <form method="GET" action="">
-        <div class="input-field">
-            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search Here...">
-            <button class="btn" type="submit" name="action">Search</button>
-        </div>
-    </form>
-    <table class="table table-bordered table-striped">
+    <div class="input-field" align="right">
+        <input type="text" style="-webkit-border-radius:20px;-moz-border-radius:20px;border-radius:20px;" id="myInput"
+               onkeyup="myFunction()" placeholder=" Search Here... ">
+    </div>
+    <table class="table table-bordered table-striped" id="myTable">
         <thead>
-        <tr>
+        <tr bgcolor="green">
             <th>Name</th>
             <th>Age</th>
             <th>Gender</th>
@@ -20,6 +49,8 @@
             <th>City</th>
             <th>Country</th>
             <th>Location</th>
+            <th bgcolor="yellow">Edit</th>
+            <th bgcolor="red">Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -35,6 +66,10 @@
             <td> {{ tenant.city }}</td>
             <td> {{ tenant.country }}</td>
             <td> {{ tenant.location }}</td>
+            <td><a href="{% url 'edit-tenant' tenant.pk %}">Edit</a></td>
+            <td><a href="#" class="btn btn-info btn-sm" onclick="deleteTenant({{tenant.pk}})">
+          <span class="glyphicon glyphicon-trash"></span> Delete
+        </a></td>
         </tr>
         {% endfor %}
         </tbody>
@@ -62,30 +97,3 @@
     {% endif %}
 </div>
 {% endblock %}
-
-{% if tenants.has_other_pages %}
-    <ul class="pagination">
-        {% if tenants.has_previous %}
-            <li class="waves-effect"><a href="?page=
-                    {{ tenants.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
-                    class="material-icons">chevron_left</i></a></li>
-        {% else %}
-            <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
-        {% endif %}
-        {% for num in tenants.paginator.page_range %}
-            {% if tenants.number == num %}
-                <li class="active"><a href="#!">{{ num }}</a></li>
-            {% else %}
-                <li class="waves-effect"><a
-                        href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
-            {% endif %}
-        {% endfor %}
-        {% if tenants.has_next %}
-            <li class="waves-effect"><a
-                    href="?page={{ tenants.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
-                    class="material-icons">chevron_right</i></a></li>
-        {% else %}
-            <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
-        {% endif %}
-    </ul>
-{% endif %}

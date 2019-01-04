@@ -1,7 +1,8 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.db.models import Q
 from django.http import HttpResponse
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
+
 from tenant_app.models import Tenant
 from .forms import TenantForm
 
@@ -27,13 +28,13 @@ def add_tenant(request):
             tenant.save()
             return render(request, 'tenant_app/tenant_add_success.html')
         else:
-            error = 'Your data is <b style="color:red">NOT</b> saved because of the following errors: <br/>'+form.errors.as_json() +'<br/>Go back and submit again with correct data'
+            error = 'Your data is <b style="color:red">NOT</b> saved because of the following errors: <br/>'+form.errors.as_json() +'<br/>Rectify them and resubmit with correct data'
             return HttpResponse(error)
 
 def all_tenants(request):
     tenants = Tenant.objects.all()
     page = request.GET.get('page', 1)
-    paginator = Paginator(tenants, 2)
+    paginator = Paginator(tenants, 100)
     try:
         tenants = paginator.page(page)
     except PageNotAnInteger:
@@ -42,10 +43,35 @@ def all_tenants(request):
         tenants = paginator.page(paginator.num_pages)
     return render(request, 'tenant_app/tenants_list.html', {'tenants':tenants})
 
-def search(request):
-    query = request.GET.get('q')
-    if query:
-        tenants = Tenant.objects.filter(
-            Q(name__icontains=query) | Q(age__icontains=query) | Q(gender__icontains=query) | Q(mobile_1__icontains=query) | Q(mobile_2__icontains=query) | Q(mobile_3__icontains=query) | Q(address_1__icontains=query) | Q(city__icontains=query) | Q(country__icontains=query) | Q(location_icontains=query)
-        ).distinct()
-    return render(request, 'tenant_app/tenants_list.html', {'tenants':tenants})
+def edit_tenant(request, id):
+    if request.method == 'GET':
+        tenant = Tenant.objects.get(pk=id)
+        form = TenantForm(instance=tenant)
+        return render(request, 'tenant_app/edit_tenant.html', {'form':form})
+    elif request.method =='POST':
+        tenant = Tenant.objects.get(pk=id)
+        form = TenantForm(request.POST, instance=tenant)
+        if form.is_valid():
+            tenant.name = form.cleaned_data['name']
+            tenant.age = form.cleaned_data['age']
+            tenant.gender = form.cleaned_data['gender']
+            tenant.mobile_1 = form.cleaned_data['mobile_1']
+            tenant.mobile_2 = form.cleaned_data['mobile_2']
+            tenant.mobile_3 = form.cleaned_data['mobile_3']
+            tenant.address_1 = form.cleaned_data['address_1']
+            tenant.city = form.cleaned_data['city']
+            tenant.country = form.cleaned_data['country']
+            tenant.location = form.cleaned_data['location']
+            tenant.save()
+            return render(request, 'tenant_app/tenant_edit_success.html')
+        else:
+            error = 'Your data is <b style="color:red">NOT</b> saved because of the following errors: <br/>' + form.errors.as_json() + '<br/>Rectify them and resubmit with correct data'
+            return HttpResponse(error)
+
+def delete_tenant(request, id):
+    tenant = Tenant.objects.get(pk = id)
+    try:
+        tenant.delete()
+        return render(request, 'tenant_app/tenant_delete_success.html')
+    except:
+        return HttpResponseRedirect('www.google.com')
