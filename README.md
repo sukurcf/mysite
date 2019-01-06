@@ -7,4 +7,4 @@
 `python manage.py runserver`
 
 3. Access the Django project from your browser using below link:
-`http://127.0.0.1:8000/`
+`http://127.0.0.1:8000/tenant_app/all_tenants 
